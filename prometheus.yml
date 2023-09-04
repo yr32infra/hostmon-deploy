@@ -24,6 +24,7 @@ scrape_configs:
         - d.yr32.net
         - oc.yr32.net
         - zerono.cloud
+        - sjcl.me
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
