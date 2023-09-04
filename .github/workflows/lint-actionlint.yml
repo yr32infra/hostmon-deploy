@@ -12,7 +12,7 @@ jobs:
     steps:
        - uses: actions/checkout@v3.5.3
 
-       - uses: reviewdog/action-actionlint@v1.34.2
+       - uses: reviewdog/action-actionlint@7485c2136bd093d2317a854c72910eebaee35238 # v1.37.1
          with:
            github_token: ${{ secrets.GITHUB_TOKEN }}
            reporter: github-pr-check
