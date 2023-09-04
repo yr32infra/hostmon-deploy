@@ -88,7 +88,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128m
+          memory: 512m
 
   influxdb:
     image: influxdb:1.8.10
