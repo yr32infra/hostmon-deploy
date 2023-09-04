@@ -1,0 +1,226 @@
+version: '3.9'
+services:
+  blackboxexporter:
+    image: prom/blackbox-exporter:v0.24.0
+    container_name: hostmon__blackboxexporter
+    hostname: blackboxexporter
+    restart: unless-stopped
+
+    volumes:
+      - type: bind
+        source: ./blackbox-exporter.yml
+        target: /etc/blackbox_exporter/config.yml
+        read_only: true
+
+    networks:
+      - default
+
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  nodeexporter:
+    image: prom/node-exporter:v1.6.1
+    container_name: hostmon__nodeexporter
+    hostname: nodeexporter
+    restart: unless-stopped
+
+    volumes:
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+        bind:
+          propagation: rslave
+
+    command:
+      - '--path.rootfs=/rootfs'
+
+    networks:
+      - default
+
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: hostmon__cadvisor
+    hostname: cadvisor
+    restart: unless-stopped
+
+    volumes:
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+
+      - type: bind
+        source: /var/run
+        target: /var/run
+        read_only: true
+
+      - type: bind
+        source: /sys
+        target: /sys
+        read_only: true
+
+      - type: bind
+        source: /var/lib/docker
+        target: /var/lib/docker
+        read_only: true
+
+      - type: bind
+        source: /dev/disk
+        target: /dev/disk
+        read_only: true
+
+    privileged: true
+
+    devices:
+      - /dev/kmsg:/dev/kmsg
+
+    networks:
+      - default
+
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+  influxdb:
+    image: influxdb:1.8.10
+    hostname: influxdb
+    container_name: hostmon__influxdb
+    restart: unless-stopped
+
+    environment:
+      INFLUXDB_DB: gnknzm_db
+      INFLUXDB_USER: user
+      INFLUXDB_USER_PASSWORD: password
+      INFLUXDB_ADMIN_ENABLED: "true"
+      INFLUXDB_ADMIN_USER: admin
+      INFLUXDB_ADMIN_PASSWORD: password
+
+    volumes:
+      - type: volume
+        source: influxdb_data
+        target: /var/lib/influxdb
+
+      - type: volume
+        source: influxdb_config
+        target: /etc/influxdb
+
+    networks:
+      - default
+
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  prometheus:
+    image: prom/prometheus:v2.46.0
+    hostname: prometheus
+    container_name: hostmon__prometheus
+    restart: unless-stopped
+
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+
+      - type: volume
+        source: prometheus_data
+        target: /prometheus
+
+    environment:
+      HOSTNAME: ${HOSTNAME}
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--enable-feature=expand-external-labels'
+
+    networks:
+      - default
+
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+  nginx:
+    image: nginx:1.25.2
+    hostname: nginx
+    container_name: hostmon__nginx
+    restart: unless-stopped
+
+    environment:
+      CF_ACCESS_CLIENT_ID: ${CF_ACCESS_CLIENT_ID}
+      CF_ACCESS_CLIENT_SECRET: ${CF_ACCESS_CLIENT_SECRET}
+
+    volumes:
+      - type: bind
+        source: ./default.conf
+        target: /etc/nginx/templates/default.conf.template
+        read_only: true
+
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana-oss:10.1.1
+    container_name: hostmon__grafana
+    restart: unless-stopped
+    hostname: grafana
+
+    ports:
+      - 3000:3000
+
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+
+    volumes:
+      - type: volume
+        source: grafana_data
+        target: /var/lib/grafana
+
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+
+    networks:
+      - default
+
+networks:
+  default:
+    name: hostmon__default
+
+volumes:
+  influxdb_config:
+    name: hostmon__influxdb_config
+
+  influxdb_data:
+    name: hostmon__influxdb_data
+
+  prometheus_data:
+    name: hostmon__prometheus_data
+
+  grafana_data:
+    name: hostmon__grafana_data
