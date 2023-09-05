@@ -5,3 +5,5 @@ Deployed on: multiple-servers (compose-cd)
 - mitou
 - arch
 - oraclecloud
+- sjcl-debian
+- zero-server
