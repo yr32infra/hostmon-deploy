@@ -35,7 +35,3 @@ scrape_configs:
 
 remote_write:
   - url: "http://nginx/api/v1/write"
-  - url: "http://influxdb:8086/api/v1/prom/write?db=gnknzm_db&u=user&p=password"
-
-remote_read:
-  - url: "http://influxdb:8086/api/v1/prom/read?db=gnknzm_db&u=user&p=password"
