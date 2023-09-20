@@ -6,4 +6,5 @@ Deployed on: multiple-servers (compose-cd)
 - arch
 - oraclecloud
 - sjcl-debian
+- sjcl-oracle
 - zero-server
