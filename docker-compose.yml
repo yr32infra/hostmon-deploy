@@ -150,7 +150,7 @@ services:
       - default
 
   grafana:
-    image: grafana/grafana-oss:10.2.3
+    image: grafana/grafana-oss:10.3.1
     container_name: hostmon__grafana
     restart: unless-stopped
     hostname: grafana
