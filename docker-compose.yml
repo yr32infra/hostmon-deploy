@@ -21,7 +21,7 @@ services:
           memory: 128m
 
   nodeexporter:
-    image: prom/node-exporter:v1.9.0
+    image: prom/node-exporter:v1.9.1
     container_name: hostmon__nodeexporter
     hostname: nodeexporter
     restart: unless-stopped
