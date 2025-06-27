@@ -91,7 +91,7 @@ services:
           memory: 1024m
 
   prometheus:
-    image: prom/prometheus:v3.4.1
+    image: prom/prometheus:v3.4.2
     hostname: prometheus
     container_name: hostmon__prometheus
     restart: unless-stopped
