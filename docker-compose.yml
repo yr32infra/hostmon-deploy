@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   blackboxexporter:
-    image: prom/blackbox-exporter:v0.26.0
+    image: prom/blackbox-exporter:v0.27.0
     container_name: hostmon__blackboxexporter
     hostname: blackboxexporter
     restart: unless-stopped
