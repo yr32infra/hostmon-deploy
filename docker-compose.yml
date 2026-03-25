@@ -126,7 +126,7 @@ services:
           memory: 2048m
 
   nginx:
-    image: nginx:1.29.6
+    image: nginx:1.29.7
     hostname: nginx
     container_name: hostmon__nginx
     restart: unless-stopped
